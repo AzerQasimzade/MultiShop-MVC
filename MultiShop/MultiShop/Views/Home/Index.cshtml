@@ -1,5 +1,9 @@
 ﻿@using MultiShop.ViewModels.Home;
  @model HomeVM
+
+@{
+    int count = 0;
+}
 <!-- Carousel Start -->
 <div class="container-fluid mb-3">
     <div class="row px-xl-5">
@@ -95,7 +99,7 @@
                         </div>
                         <div class="flex-fill pl-3">
                             <h6>@category.Name</h6>
-                            <small class="text-body">@category.ProductCount @category.Name</small>
+                            <small class="text-body">@category.ProductCount @(category.ProductCount>1?"Products":"Product")</small>
                         </div>
                     </div>
                 </a>

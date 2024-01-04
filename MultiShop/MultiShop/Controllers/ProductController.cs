@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using MultiShop.DAL;
 using MultiShop.Models;
 using MultiShop.ViewModels;
+using MultiShop.ViewModels.Detail;
+using MultiShop.ViewModels.Home;
 
 namespace MultiShop.Controllers
 {
@@ -14,29 +16,6 @@ namespace MultiShop.Controllers
         {
             _context = context;
         }
-        //public async Task<IActionResult> Shop(int order)
-        //{
-        //    List<Productlar>productlars =await _context.Productlar.ToListAsync();
-        //    switch (order)
-        //    {
-        //        case 1:
-        //            productlars = productlars.OrderBy(p => p.Name).ToList();
-        //            break;
-        //        case 2:
-        //            productlars = productlars.OrderBy(p=>p.Price).ToList();
-        //            break;  
-        //        case 3:
-        //            productlars = productlars.OrderByDescending(p => p.Id).ToList();  
-        //            break;
-        //    }
-        //    HomeVM homeVM = new HomeVM
-        //    {
-        //        Categories = await _context.Categories.Include(c => c.Productlar).ToListAsync(),
-        //        Productlar = await _context.Productlar.ToListAsync(),
-        //        Order = order
-        //    };
-        //    return View(homeVM);
-        //}
         public async Task<IActionResult> Shop(int page=1,int order=1)
         {
             int count= await _context.Productlar.CountAsync();
@@ -56,6 +35,7 @@ namespace MultiShop.Controllers
                     productlars = productlars.OrderByDescending(p => p.Id).ToList();
                     break; 
             }
+            
             PaginateVM<Productlar> paginateVM = new PaginateVM<Productlar>
             {
                 Categories = await _context.Categories.Include(c => c.Productlar).ToListAsync(),
@@ -67,23 +47,29 @@ namespace MultiShop.Controllers
             };
             return View(paginateVM);
         }
-        public async Task<IActionResult> Details()
+        public async Task<IActionResult> Details(int id)
         {
-            //Product product = await _context.Products
-            //    .Include(x => x.Category)
-            //    .Include(x => x.ProductImages)
-            //    .Include(x => x.ProductTags)
-            //    .ThenInclude(pt => pt.Tag)
-            //    .Include(x => x.ProductColors)
-            //    .ThenInclude(x => x.Color)
-            //    .Include(x => x.ProductSizes)
-            //    .ThenInclude(x => x.Size)
-            //    .FirstOrDefaultAsync(x => x.Id == id);
-            //if (product is null)
-            //{
-            //    return NotFound();
-            //}
-            return View();
+            if (id<=0) return BadRequest();
+            Productlar product=await _context.Productlar
+                .Include(p=>p.Category)
+                .Include(p => p.ProductImages)
+                .Include(p=>p.ProductColors)
+                .ThenInclude(p=>p.Color)
+                .FirstOrDefaultAsync(p => p.Id == id);
+
+            List<Productlar> relatedproducts = await _context.Productlar
+                .Include(x => x.Category)
+                .Include(x => x.ProductImages)
+                .Where(x => x.Id != id).Where(x => x.CategoryId == product.CategoryId).ToListAsync();
+            if (product is null) return NotFound();
+
+            DetailVM detailVM = new DetailVM
+            {
+                Products = product,
+                RelatedProducts = relatedproducts,
+            };
+
+            return View(detailVM);
         }
     }
 }

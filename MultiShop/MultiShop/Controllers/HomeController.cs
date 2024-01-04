@@ -18,8 +18,8 @@ namespace MultiShop.Controllers
         {
             List<Slide> slides=await _context.Slides.OrderBy(s => s.Order).Take(3).ToListAsync();
             List<Category> categories =await _context.Categories.ToListAsync();
-            List<Productlar> productlar =await _context.Productlar.Take(6).ToListAsync();
-            List<Productlar> recentProducts=await _context.Productlar.OrderByDescending(s=>s.Id).Take(6).ToListAsync();
+            List<Productlar> productlar =await _context.Productlar.Take(6).Include(p=>p.ProductImages).ToListAsync();
+            List<Productlar> recentProducts=await _context.Productlar.OrderByDescending(s=>s.Id).Take(6).Include(p => p.ProductImages).ToListAsync();
 
             HomeVM homeVM = new HomeVM
             {

@@ -140,15 +140,6 @@
                             </select>
                             </form>
                             </div>
-                            @* <div class="btn-group">
-                                <form asp-action="Shop" asp-controller="Product">
-                                    <select onchange="this.form.submit()" name="Order" class="nice-select">
-                                        <option value="1" @(Model.Order == 1 ? "selected" : "")>Sort by Name</option>
-                                        <option value="2" @(Model.Order == 2 ? "selected" : "")>Sort by Price</option>
-                                        <option value="3" @(Model.Order == 3 ? "selected" : "")>Sort by Date</option>
-                                    </select>
-                                </form>
-                            </div> *@
                             <div class="btn-group ml-2">
                                 <button type="button" class="btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown">Showing</button>
                                 <div class="dropdown-menu dropdown-menu-right">
@@ -166,7 +157,7 @@
                     <div class="col-lg-4 col-md-6 col-sm-6 pb-1">
                         <div class="product-item bg-light mb-4">
                             <div class="product-img position-relative overflow-hidden">
-                                <img class="img-fluid w-100" src="~/assets/img/@item.Image" alt="">
+                                <img class="img-fluid w-100" src="~/assets/img/@item.ProductImages.FirstOrDefault(s=>s.IsPrimary==true).Url" alt="">
                                 <div class="product-action">
                                     <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-shopping-cart"></i></a>
                                     <a class="btn btn-outline-dark btn-square" href=""><i class="far fa-heart"></i></a>
