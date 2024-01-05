@@ -16,13 +16,26 @@ namespace MultiShop.Controllers
         {
             _context = context;
         }
-        public async Task<IActionResult> Shop(int page=1,int order=1)
+        public async Task<IActionResult> Shop(int page=1,int? id=null,int order=1)
         {
             int count= await _context.Productlar.CountAsync();
 
-            List<Productlar> productlars = await _context.Productlar.Skip((page-1)*6).Take(6)
-                .Include(c=>c.Category) 
+            List<Productlar> productlars = new List<Productlar>();
+
+            if (id == null)
+            {
+                productlars= await _context.Productlar.Skip((page - 1) * 6).Take(6)
+                .Include(c => c.Category)
+                .Include(c => c.ProductImages.Where(p => p.IsPrimary == true))
                 .ToListAsync();
+            }
+            else
+            {
+                productlars=await _context.Productlar.Where(x=>x.CategoryId==id).Skip((page - 1) * 6).Take(6)
+                .Include(c => c.Category)
+                .Include(c => c.ProductImages.Where(p => p.IsPrimary == true))
+                .ToListAsync();
+            }    
             switch (order)
             {
                 case 1:
@@ -33,9 +46,8 @@ namespace MultiShop.Controllers
                     break;
                 case 3:
                     productlars = productlars.OrderByDescending(p => p.Id).ToList();
-                    break; 
-            }
-            
+                    break;
+            } 
             PaginateVM<Productlar> paginateVM = new PaginateVM<Productlar>
             {
                 Categories = await _context.Categories.Include(c => c.Productlar).ToListAsync(),
@@ -44,6 +56,7 @@ namespace MultiShop.Controllers
                 Items = productlars,
                 CurrentPage = page,
                 TotalPage= Math.Ceiling((double)count / 6)
+                
             };
             return View(paginateVM);
         }
@@ -68,8 +81,14 @@ namespace MultiShop.Controllers
                 Products = product,
                 RelatedProducts = relatedproducts,
             };
-
             return View(detailVM);
         }
+        //public async Task<IActionResult> CategoryShop(Category category)
+        //{
+        //    List<Productlar> productlars = await _context.Productlar
+        //        .Where(p=>p.Category==category)
+        //        .ToListAsync();
+        //    return View(productlars);
+        //}
     }
 }

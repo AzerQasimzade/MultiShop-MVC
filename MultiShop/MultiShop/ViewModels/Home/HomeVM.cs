@@ -9,9 +9,5 @@ namespace MultiShop.ViewModels.Home
         public List<Productlar> Productlar { get; set; }
         public List<Productlar> RecentProducts { get; set; }
         public int? Order { get; set; }
-
-
-
-
     }
 }

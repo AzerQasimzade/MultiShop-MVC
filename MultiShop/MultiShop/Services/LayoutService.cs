@@ -24,8 +24,5 @@ namespace MultiShop.Services
             List<string> categoryNames = categories.Select(c => c.Name).ToList();
             return categoryNames;
         }
-
-
-
     }
 }
