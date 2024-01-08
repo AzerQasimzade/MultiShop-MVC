@@ -46,7 +46,7 @@ namespace MultiShop.Areas.MultiShopAdmin.Controllers
                 ModelState.AddModelError("Photo", "File olcusu 1 mb den boyuk olmamalidir");
                 return View();
             }
-            string filename = await slideVM.Photo.CreateFileAsync(_env.WebRootPath, "assets", "images", "slider");
+            string filename = await slideVM.Photo.CreateFileAsync(_env.WebRootPath, "assets", "img");
             Slide slide = new Slide
             {
                 Image = filename,

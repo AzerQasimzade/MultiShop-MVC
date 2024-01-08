@@ -12,8 +12,6 @@ namespace MultiShop.Models
         public string? Activated { get; set; }
         public int SlideTo { get; set; } //for Slide's mini box
         public string? SlidesBtn { get; set; }
-        //[NotMapped]
-        //public IFormFile? Photo { get; set; }
 
     }
 }

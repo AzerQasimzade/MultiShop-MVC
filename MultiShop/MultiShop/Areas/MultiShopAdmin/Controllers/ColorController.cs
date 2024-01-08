@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MultiShop.Areas.MultiShopAdmin.ViewModels;
 using MultiShop.DAL;
 using MultiShop.Models;
 
@@ -24,30 +25,100 @@ namespace MultiShop.Areas.MultiShopAdmin.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Color color)
+        public async Task<IActionResult> Create(CreateColorVM colorVM)
         {
             if (!ModelState.IsValid)
             {
                 return View();
             }
-            bool result = _context.Colors.Any(x => x.Name == color.Name);
+            bool result = _context.Colors.Any(x => x.Name == colorVM.Name);
             if (result)
             {
                 ModelState.AddModelError("Name", "Bu adda color artiq movcuddur");
                 return View();
             }
-            Color newcolor = new Color
+            Color color = new Color
             {
-                Name = color.Name
+                Name = colorVM.Name
             };
 
-            await _context.Colors.AddAsync(newcolor);
+            await _context.Colors.AddAsync(color);
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
         }
 
+        public async Task<IActionResult> Update(int id)
+        {
+            if (id <= 0)
+            {
+                return BadRequest();
+            }
+            Color color = await _context.Colors.FirstOrDefaultAsync(x => x.Id == id);
 
+            if (color is null)
+            {
+                return NotFound();
+            }
+            UpdateColorVM colorVM = new UpdateColorVM
+            {
+                Name = color.Name,
+            };
+            return View(colorVM);
+        }
+        [HttpPost]
+        public async Task<IActionResult> Update(int id, UpdateColorVM colorVM)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
+            Color existed = await _context.Colors.FirstOrDefaultAsync(x => x.Id == id);
+            if (existed is null)
+            {
+                return NotFound();
+            }
+            bool result = await _context.Colors.AnyAsync(x => x.Name == colorVM.Name && x.Id != colorVM.Id);
+            if (result)
+            {
+                ModelState.AddModelError("Name", "We have Same Color Name.Please Try Another Name");
+                return View();
+            }
+            existed.Name = colorVM.Name;
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+        public async Task<IActionResult> Delete(int id)
+        {
+            if (id <= 0)
+            {
+                return BadRequest();
+            }
+            Color color = await _context.Colors.FirstOrDefaultAsync(x => x.Id == id);
 
+            if (color is null)
+            {
+                return NotFound();
+            }
+            _context.Colors.Remove(color);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+        public async Task<IActionResult> Details(int id)
+        {
+            Color color = await _context.Colors
+                .Include(x => x.ProductColors)
+                .ThenInclude(x => x.Product)
+                .ThenInclude(x => x.ProductImages)
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (color is null)
+            {
+                return NotFound();
+            }
+            return View(color);
+        }
     }
+
 }
+
